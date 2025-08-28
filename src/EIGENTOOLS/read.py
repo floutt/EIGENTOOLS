@@ -112,7 +112,7 @@ class Ind_Info:
 
 class EigenStrat:
     def __init__(self, geno_file=None, ind_file=None, snp_file=None,
-                 file_prefix=None):
+                 file_prefix=None, check_hash=True, check_size=True):
         paramter_error_msg = "Inappropriate parametrization. Either only provide a 'file_prefix' parameter or provide parameters for each individual EIGENSTRAT file component"
         # parameter handling to allow for init polymorphism
         if file_prefix is None:
@@ -127,7 +127,6 @@ class EigenStrat:
                 geno_file = file_prefix + ".geno"
                 ind_file = file_prefix + ".ind"
                 snp_file = file_prefix + ".snp"
-
         self._GENO_MAP = [0, 1, 2, nan]
         self.snp_info = SNP_Info(snp_file)
         self.ind_info = Ind_Info(ind_file)
@@ -142,8 +141,22 @@ class EigenStrat:
         if not raw_header.startswith("GENO"):
             raise Exception("Improper .geno filetype")
         self._HEADER = raw_header.replace(chr(0), "")  # remove NULL chars
+        # perform optional checks
+        header_elems = self._HEADER.split()
+        n_ind = int(header_elems[1])
+        n_snp = int(header_elems[2])
+        ind_hash = int(header_elems[3], 16)
+        snp_hash = int(header_elems[4], 16)
         self._i_snp = -1
         self.geno = [0] * len(self.ind_info)
+        if (check_hash) & (ind_hash != self.ind_info._hash):
+            raise Exception(".ind file hash mismatch. Calculated hash of %x does not match expected hash of %x" % (self.ind_info._hash, ind_hash))
+        if (check_hash) & (snp_hash != self.snp_info._hash):
+            raise Exception(".snp file hash mismatch. Calculated hash of %x does not match expected hash of %x" % (self.snp_info._hash, snp_hash))
+        if (check_size) & (n_ind != len(self.ind_info)):
+            raise Exception("Number of individuals in .ind file (n=%i) different from what is expected by .geno file (n=%i)" % (len(self.ind_info), n_ind))
+        if (check_size) & (n_snp != len(self.snp_info)):
+            raise Exception("Number of SNPs in .snp file (m=%i) different from what is expected by .geno file (m=%i)" % (len(self.snp_info), n_snp))
 
     def __iter__(self):
         return self
