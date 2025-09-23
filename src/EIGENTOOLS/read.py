@@ -40,26 +40,45 @@ class SNP_Info:
             for line in f:
                 elems = line.strip().split()
                 self.var_name.append(elems[0])
-                self._var_name_to_index[elems[0]] = i
                 self.chrom.append(elems[1])
                 self.pos.append(int(elems[3]))
                 self.ref.append(elems[4])
                 self.alt.append(elems[5])
                 i += 1
+        self._var_name_to_index = self._reverse_index()
         self._hash = hash_list(self.var_name)
 
+    def _reverse_index(self):
+        out = {}
+        for i in range(len(self)):
+            out[self.var_name[i]] = i
+        return out
+
     def __getitem__(self, index):
+        is_int = isinstance(index, int)
         tmp_obj = copy.copy(self)
-        tmp_obj.var_name = tmp_obj.var_name[index]
-        tmp_obj.chrom = tmp_obj.chrom[index]
-        tmp_obj.pos = tmp_obj.pos[index]
-        tmp_obj.ref = tmp_obj.ref[index]
-        tmp_obj.alt = tmp_obj.alt[index]
+        tmp_obj.var_name = [tmp_obj.var_name[index]] if is_int else tmp_obj.var_name[index]
+        tmp_obj.chrom = [tmp_obj.chrom[index]] if is_int else tmp_obj.chrom[index]
+        tmp_obj.pos = [tmp_obj.pos[index]] if is_int else tmp_obj.pos[index]
+        tmp_obj.ref = [tmp_obj.ref[index]] if is_int else tmp_obj.ref[index]
+        tmp_obj.alt = [tmp_obj.alt[index]] if is_int else tmp_obj.alt[index]
+        tmp_obj._hash = hash_list(tmp_obj.var_name)
+        # redo reverse index
+        tmp_obj._var_name_to_index = tmp_obj._reverse_index()
         return tmp_obj
 
     def __len__(self):
         assert len(self.var_name) == len(self.chrom) == len(self.pos) == len(self.ref) == len(self.alt)
         return len(self.var_name)
+
+    def __add__(self, obj2):
+        tmp_obj = copy.copy(self)
+        tmp_obj.var_name = tmp_obj.var_name + obj2.var_name
+        tmp_obj.chrom = tmp_obj.chrom + obj2.chrom
+        tmp_obj.pos = tmp_obj.pos + obj2.pos
+        tmp_obj.ref = tmp_obj.ref + obj2.ref
+        tmp_obj.alt = tmp_obj.alt + obj2.alt
+        return tmp_obj
 
     def get_var_name_idx(self, var_name):
         try:
@@ -84,24 +103,32 @@ class Ind_Info:
                 self.ind_name.append(elems[0])
                 self.sex.append(elems[1])
                 self.label.append(elems[2])
-                # fill label to idx mapper
-                try:
-                    self._label_to_idx[elems[2]].append(i)
-                except KeyError:
-                    self._label_to_idx[elems[2]] = [i]
                 i += 1
+        self._label_to_idx = self._reverse_index()
         self._hash = hash_list(self.ind_name)
 
     def __getitem__(self, index):
+        is_int = isinstance(index, int)
         tmp_obj = copy.copy(self)
-        tmp_obj.ind_name = tmp_obj.ind_name[index]
-        tmp_obj.sex = tmp_obj.sex[index]
-        tmp_obj.label = tmp_obj.label[index]
+        tmp_obj.ind_name = [tmp_obj.ind_name[index]] if is_int else tmp_obj.ind_name[index]
+        tmp_obj.sex = [tmp_obj.sex[index]] if is_int else tmp_obj.sex[index]
+        tmp_obj.label = [tmp_obj.label[index]] if is_int else tmp_obj.label[index]
+        tmp_obj._hash = hash_list(tmp_obj.ind_name)
+        tmp_obj._label_to_idx = tmp_obj._reverse_index()
         return tmp_obj
 
     def __len__(self):
         assert len(self.ind_name) == len(self.sex) == len(self.label)
         return len(self.ind_name)
+
+    def _reverse_index(self):
+        out = {}
+        for i in range(len(self)):
+            try:
+                out[self.label[i]].append(i)
+            except KeyError:
+                out[self.label[i]] = [i]
+        return out
 
     def get_label_indices(self, label):
         try:
