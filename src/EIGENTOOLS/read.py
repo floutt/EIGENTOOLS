@@ -78,6 +78,8 @@ class SNP_Info:
         tmp_obj.pos = tmp_obj.pos + obj2.pos
         tmp_obj.ref = tmp_obj.ref + obj2.ref
         tmp_obj.alt = tmp_obj.alt + obj2.alt
+        tmp_obj._hash = hash_list(tmp_obj.var_name)
+        tmp_obj._var_name_to_index = tmp_obj._reverse_index()
         return tmp_obj
 
     def get_var_name_idx(self, var_name):
@@ -120,6 +122,15 @@ class Ind_Info:
     def __len__(self):
         assert len(self.ind_name) == len(self.sex) == len(self.label)
         return len(self.ind_name)
+
+    def __add__(self, obj2):
+        tmp_obj = copy.copy(self)
+        tmp_obj.ind_name = tmp_obj.ind_name + obj2.ind_name
+        tmp_obj.sex = tmp_obj.sex + obj2.sex
+        tmp_obj.label = tmp_obj.label + obj2.label
+        tmp_obj._hash = hash_list(tmp_obj.ind_name)
+        tmp_obj._label_to_idx = tmp_obj._reverse_index()
+        return tmp_obj
 
     def _reverse_index(self):
         out = {}
