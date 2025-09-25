@@ -4,7 +4,8 @@ val_map = {0: 0, 1: 1, 2: 2, nan: 3}
 
 
 class PackedAncestryMapWriter:
-    def __init__(self, file_prefix, snp_obj, ind_obj):
+    def __init__(self, snp_obj, ind_obj, geno_file=None, ind_file=None,
+                 snp_file=None, file_prefix=None):
         # generate useful metadata
         self._nind = len(snp_obj)
         self._nsnp = len(ind_obj)
@@ -15,9 +16,21 @@ class PackedAncestryMapWriter:
         self._trailingbytes = bytes(self._recordsize - self._min_byte_per_record)
 
         # write the snp and ind files and the header for the PACKEDANCESTRYMAP
-        snp_file = file_prefix + ".snp"
-        ind_file = file_prefix + ".ind"
-        geno_file = file_prefix + ".geno"
+        # parameter handling to allow for init polymorphism
+        paramter_error_msg = "Inappropriate parametrization. Either only provide a 'file_prefix' parameter or provide parameters for each individual EIGENSTRAT file component"
+        if file_prefix is None:
+            if not ((geno_file is not None) and (ind_file is not None) and
+                    (snp_file is not None)):
+                raise TypeError(paramter_error_msg)
+        else:
+            if not ((geno_file is None) and (ind_file is None) and
+                    (snp_file is None)):
+                raise TypeError(paramter_error_msg)
+            else:
+                geno_file = file_prefix + ".geno"
+                ind_file = file_prefix + ".ind"
+                snp_file = file_prefix + ".snp"
+
         self._fgeno = open(geno_file, "wb+")
 
         snp_obj.write(snp_file)
