@@ -88,6 +88,12 @@ class SNP_Info:
         except KeyError:
             raise LookupError("Variant \"" + var_name + "\" not found")
 
+    def write(self, filename):
+        with open(filename, "w+") as f:
+            for i in range(len(self)):
+                f.write("%s\t%s\t%.6f\t%i\t%s\t%s\n" %
+                        (self.var_name[i], self.chrom[i], 0, self.pos[i],
+                         self.ref[i], self.alt[i]))
 
 # ADD STUFF
 class Ind_Info:
@@ -146,6 +152,12 @@ class Ind_Info:
             return self._label_to_idx[label]
         except KeyError:
             raise LookupError("Label \"" + label + "\" not found.")
+
+    def write(self, filename):
+        with open(filename, "w+") as f:
+            for i in range(len(self)):
+                f.write("%s\t%s\t%s\n" %
+                        (self.ind_name[i], self.sex[i], self.label[i]))
 
 
 class EigenStrat:
