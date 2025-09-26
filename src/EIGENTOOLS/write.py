@@ -1,4 +1,5 @@
 from math import ceil, nan
+import warnings
 
 val_map = {0: 0, 1: 1, 2: 2, nan: 3}
 
@@ -14,6 +15,8 @@ class PackedAncestryMapWriter:
         self._min_byte_per_record = ceil(self._nind / 4)
         self._recordsize = max(self._min_byte_per_record, len(header))
         self._trailingbytes = bytes(self._recordsize - self._min_byte_per_record)
+        self._isclosed = False
+        self._recordsleft = self._nsnp
 
         # write the snp and ind files and the header for the PACKEDANCESTRYMAP
         # parameter handling to allow for init polymorphism
@@ -42,7 +45,16 @@ class PackedAncestryMapWriter:
     def write_record(self, dosage_list):
         shift_by = 6
         record = 0
+        # check length
+        if len(dosage_list) != self._nind:
+            raise ValueError("Length of record should be equal to %i, the number of individuals in the dataset." % self._nind)
+        elif self._isclosed:
+            raise ValueError("PackedAncestryMapWriter object is closed.")
         for v in dosage_list:
+            try:
+                val_map[v]
+            except KeyError:
+                raise ValueError("Dosages must either be 0,1,2, or nan.")
             if (shift_by == 0):
                 record = record + (val_map[v] << shift_by)
                 self._fgeno.write(bytes([record]))
@@ -55,3 +67,13 @@ class PackedAncestryMapWriter:
             self._fgeno.write(bytes([record]))
         # write trailing bytes
         self._fgeno.write(bytes(self._recordsize - self._min_byte_per_record))
+        self._recordsleft -= 1
+
+    def close(self):
+        if self._isclosed:
+            return None
+        else:
+            if self._recordsleft != 0:
+                warnings.warn("Incomplete number of records written. File may be corrupt.")
+            self._fgeno.close()
+            self._isclosed = True
