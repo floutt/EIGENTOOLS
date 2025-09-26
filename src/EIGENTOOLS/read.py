@@ -32,6 +32,7 @@ class SNP_Info:
         self.pos = []
         self.ref = []
         self.alt = []
+        self.cm = []
         self._var_name_to_index = {}
         self._hash = 0
 
@@ -44,6 +45,7 @@ class SNP_Info:
                 self.pos.append(int(elems[3]))
                 self.ref.append(elems[4])
                 self.alt.append(elems[5])
+                self.cm.append(float(elems[2]))
                 i += 1
         self._var_name_to_index = self._reverse_index()
         self._hash = hash_list(self.var_name)
@@ -62,13 +64,14 @@ class SNP_Info:
         tmp_obj.pos = [tmp_obj.pos[index]] if is_int else tmp_obj.pos[index]
         tmp_obj.ref = [tmp_obj.ref[index]] if is_int else tmp_obj.ref[index]
         tmp_obj.alt = [tmp_obj.alt[index]] if is_int else tmp_obj.alt[index]
+        tmp_obj.cm = [tmp_obj.cm[index]] if is_int else tmp_obj.cm[index]
         tmp_obj._hash = hash_list(tmp_obj.var_name)
         # redo reverse index
         tmp_obj._var_name_to_index = tmp_obj._reverse_index()
         return tmp_obj
 
     def __len__(self):
-        assert len(self.var_name) == len(self.chrom) == len(self.pos) == len(self.ref) == len(self.alt)
+        assert len(self.var_name) == len(self.chrom) == len(self.pos) == len(self.ref) == len(self.alt) == len(self.cm)
         return len(self.var_name)
 
     def __add__(self, obj2):
@@ -78,6 +81,7 @@ class SNP_Info:
         tmp_obj.pos = tmp_obj.pos + obj2.pos
         tmp_obj.ref = tmp_obj.ref + obj2.ref
         tmp_obj.alt = tmp_obj.alt + obj2.alt
+        tmp_obj.cm = tmp_obj.cm + obj2.cm
         tmp_obj._hash = hash_list(tmp_obj.var_name)
         tmp_obj._var_name_to_index = tmp_obj._reverse_index()
         return tmp_obj
@@ -92,7 +96,7 @@ class SNP_Info:
         with open(filename, "w+") as f:
             for i in range(len(self)):
                 f.write("%s\t%s\t%.6f\t%i\t%s\t%s\n" %
-                        (self.var_name[i], self.chrom[i], 0, self.pos[i],
+                        (self.var_name[i], self.chrom[i], self.cm[i], self.pos[i],
                          self.ref[i], self.alt[i]))
 
 # ADD STUFF
