@@ -99,6 +99,7 @@ class SNP_Info:
                         (self.var_name[i], self.chrom[i], self.cm[i], self.pos[i],
                          self.ref[i], self.alt[i]))
 
+
 # ADD STUFF
 class Ind_Info:
     def __init__(self, filename):
@@ -164,10 +165,10 @@ class Ind_Info:
                         (self.ind_name[i], self.sex[i], self.label[i]))
 
 
-class EigenStrat:
+class PackedAncestryMap:
     def __init__(self, geno_file=None, ind_file=None, snp_file=None,
                  file_prefix=None, check_hash=True, check_size=True):
-        paramter_error_msg = "Inappropriate parametrization. Either only provide a 'file_prefix' parameter or provide parameters for each individual EIGENSTRAT file component"
+        paramter_error_msg = "Inappropriate parametrization. Either only provide a 'file_prefix' parameter or provide parameters for each individual PACKEDANCESTRYMAP file component"
         # parameter handling to allow for init polymorphism
         if file_prefix is None:
             if not ((geno_file is not None) and (ind_file is not None) and

@@ -20,7 +20,7 @@ class PackedAncestryMapWriter:
 
         # write the snp and ind files and the header for the PACKEDANCESTRYMAP
         # parameter handling to allow for init polymorphism
-        paramter_error_msg = "Inappropriate parametrization. Either only provide a 'file_prefix' parameter or provide parameters for each individual EIGENSTRAT file component"
+        paramter_error_msg = "Inappropriate parametrization. Either only provide a 'file_prefix' parameter or provide parameters for each individual PACKEDANCESTRYMAP file component"
         if file_prefix is None:
             if not ((geno_file is not None) and (ind_file is not None) and
                     (snp_file is not None)):
