@@ -8,8 +8,8 @@ class PackedAncestryMapWriter:
     def __init__(self, snp_obj, ind_obj, geno_file=None, ind_file=None,
                  snp_file=None, file_prefix=None):
         # generate useful metadata
-        self._nind = len(snp_obj)
-        self._nsnp = len(ind_obj)
+        self._nind = len(ind_obj)
+        self._nsnp = len(snp_obj)
         header = ("GENO   %i %i %x %x" % (self._nind, self._nsnp,
                                           ind_obj._hash, snp_obj._hash)).encode()
         self._min_byte_per_record = ceil(self._nind / 4)

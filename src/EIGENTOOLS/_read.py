@@ -12,8 +12,7 @@ def hash_str(s):
     return hash_out
 
 
-# get hash from a list of strings
-# 32 bit etc.
+# get 32-bit hash from a list of strings.
 def hash_list(str_list):
     hash_out = 0
     bit_mask = ((2 ** 32) - 1)
@@ -100,7 +99,6 @@ class SNP_Info:
                          self.ref[i], self.alt[i]))
 
 
-# ADD STUFF
 class Ind_Info:
     def __init__(self, filename):
         self.ind_name = []
