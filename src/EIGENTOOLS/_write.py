@@ -6,7 +6,8 @@ val_map = {0: 0, 1: 1, 2: 2, nan: 3}
 
 class PackedAncestryMapWriter:
     def __init__(self, snp_obj, ind_obj, geno_file=None, ind_file=None,
-                 snp_file=None, file_prefix=None):
+                 snp_file=None, file_prefix=None, write_snp=True,
+                 write_ind=True):
         # generate useful metadata
         self._nind = len(ind_obj)
         self._nsnp = len(snp_obj)
@@ -36,8 +37,10 @@ class PackedAncestryMapWriter:
 
         self._fgeno = open(geno_file, "wb+")
 
-        snp_obj.write(snp_file)
-        ind_obj.write(ind_file)
+        if write_snp:
+            snp_obj.write(snp_file)
+        if write_ind:
+            ind_obj.write(ind_file)
         # write header
         self._fgeno.write(header)
         self._fgeno.write(bytes(self._recordsize - len(header)))
