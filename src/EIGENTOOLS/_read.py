@@ -16,7 +16,7 @@ def hash_str(s: str) -> int:
         s: String to be hashed
 
     Returns:
-        Integer hash for string
+        int: Integer hash for string
     """
     hash_out = 0
     for c in s:
@@ -33,7 +33,7 @@ def hash_list(str_list: list[str]) -> int:
         str_list: List of strings
 
     Returns:
-        32-bit hash of list of strings
+        int: 32-bit hash of list of strings
     """
     hash_out = 0
     bit_mask = ((2 ** 32) - 1)
@@ -58,7 +58,13 @@ class SNP_Info:
         _var_name_to_index (dict): Reverse index for var_name
         _hash (int): Hash value for .snp file
     """
-    def __init__(self, filename: str):
+    def __init__(self, filename: str) -> None:
+        """
+        Initializes SNP_Info object.
+
+        Args:
+            filename (str): Location of the ".snp" file
+        """
         self.var_name = []
         self.chrom = []
         self.cm = []
@@ -82,13 +88,28 @@ class SNP_Info:
         self._var_name_to_index = self._reverse_index()
         self._hash = hash_list(self.var_name)
 
-    def _reverse_index(self):
+    def _reverse_index(self) -> dict:
+        """
+        Creates a reverse index for variant names
+
+        Returns:
+            dict: A reverse index dictionary
+        """
         out = {}
         for i in range(len(self)):
             out[self.var_name[i]] = i
         return out
 
-    def __getitem__(self, index: int | slice):
+    def __getitem__(self, index: int | slice) -> Self:
+        """
+        Subsets the SNP_Info object to only those SNPs at a given index
+
+        Args:
+            index (int | slice): Index of elements to include
+
+        Returns:
+            SNP_Info: Subsetted SNP_Info
+        """
         is_int = isinstance(index, int)
         tmp_obj = copy.copy(self)
         tmp_obj.var_name = [tmp_obj.var_name[index]] if is_int else tmp_obj.var_name[index]
@@ -102,11 +123,26 @@ class SNP_Info:
         tmp_obj._var_name_to_index = tmp_obj._reverse_index()
         return tmp_obj
 
-    def __len__(self):
+    def __len__(self) -> int:
+        """
+        Gets length of SNP_Info object
+
+        Returns:
+            int: Length of SNP_Info object
+        """
         assert len(self.var_name) == len(self.chrom) == len(self.pos) == len(self.ref) == len(self.alt) == len(self.cm)
         return len(self.var_name)
 
-    def __add__(self, obj2: Self):
+    def __add__(self, obj2: Self) -> Self:
+        """
+        Adds two SNP_Info objects
+
+        Args:
+            obj2 (SNP_Info): The SNP_Info file to append to current object
+
+        Returns:
+            SNP_Info: Added SNP_Info object
+        """
         tmp_obj = copy.copy(self)
         tmp_obj.var_name = tmp_obj.var_name + obj2.var_name
         tmp_obj.chrom = tmp_obj.chrom + obj2.chrom
@@ -118,13 +154,28 @@ class SNP_Info:
         tmp_obj._var_name_to_index = tmp_obj._reverse_index()
         return tmp_obj
 
-    def get_var_name_idx(self, var_name: str):
+    def get_var_name_idx(self, var_name: str) -> int:
+        """
+        Gets index of a specific variant name
+
+        Args:
+            var_name (str): Name of variant
+
+        Returns:
+            int: index of variant name
+        """
         try:
             return self._var_name_to_index[var_name]
         except KeyError:
             raise LookupError("Variant \"" + var_name + "\" not found")
 
-    def write(self, filename: str):
+    def write(self, filename: str) -> None:
+        """
+        Writes object to ".snp" file
+
+        Args:
+            filename (str): Output filename
+        """
         with open(filename, "w+") as f:
             for i in range(len(self)):
                 f.write("%s\t%s\t%.6f\t%i\t%s\t%s\n" %
@@ -144,7 +195,13 @@ class Ind_Info:
         _hash (int): Hash value for .ind file
     """
 
-    def __init__(self, filename: str):
+    def __init__(self, filename: str) -> None:
+        """
+        Initializes Ind_Info object.
+
+        Args:
+            filename (str): Location of the ".ind" file
+        """
         self.ind_name = []
         self.sex = []
         self.label = []
@@ -162,7 +219,16 @@ class Ind_Info:
         self._label_to_idx = self._reverse_index()
         self._hash = hash_list(self.ind_name)
 
-    def __getitem__(self, index: int | slice):
+    def __getitem__(self, index: int | slice) -> Self:
+        """
+        Subsets the Ind_Info object to only those individuals at a given index
+
+        Args:
+            index (int | slice): Index of elements to include
+
+        Returns:
+            Ind_Info: Subsetted Ind_Info
+        """
         is_int = isinstance(index, int)
         tmp_obj = copy.copy(self)
         tmp_obj.ind_name = [tmp_obj.ind_name[index]] if is_int else tmp_obj.ind_name[index]
@@ -172,11 +238,26 @@ class Ind_Info:
         tmp_obj._label_to_idx = tmp_obj._reverse_index()
         return tmp_obj
 
-    def __len__(self):
+    def __len__(self) -> int:
+        """
+        Gets length of Ind_Info object
+
+        Returns:
+            int: Length of Ind_Info object
+        """
         assert len(self.ind_name) == len(self.sex) == len(self.label)
         return len(self.ind_name)
 
-    def __add__(self, obj2: Self):
+    def __add__(self, obj2: Self) -> Self:
+        """
+        Adds two Ind_Info objects
+
+        Args:
+            obj2 (Ind_Info): The Ind_Info file to append to current object
+
+        Returns:
+            SNP_Info: Added Ind_Info object
+        """
         tmp_obj = copy.copy(self)
         tmp_obj.ind_name = tmp_obj.ind_name + obj2.ind_name
         tmp_obj.sex = tmp_obj.sex + obj2.sex
@@ -185,7 +266,13 @@ class Ind_Info:
         tmp_obj._label_to_idx = tmp_obj._reverse_index()
         return tmp_obj
 
-    def _reverse_index(self):
+    def _reverse_index(self) -> dict:
+        """
+        Creates a reverse index for individual names
+
+        Returns:
+            dict: A reverse index dictionary
+        """
         out = {}
         for i in range(len(self)):
             try:
@@ -194,13 +281,25 @@ class Ind_Info:
                 out[self.label[i]] = [i]
         return out
 
-    def get_label_indices(self, label: str):
+    def get_label_indices(self, label: str) -> list:
+        """
+        Returns indices of individuals who have a particular label.
+
+        Args:
+            label (str): Label of the items whose indices will be return
+        """
         try:
             return self._label_to_idx[label]
         except KeyError:
             raise LookupError("Label \"" + label + "\" not found.")
 
-    def write(self, filename: str):
+    def write(self, filename: str) -> None:
+        """
+        Writes object to ".ind" file
+
+        Args:
+            filename (str): Output filename
+        """
         with open(filename, "w+") as f:
             for i in range(len(self)):
                 f.write("%s\t%s\t%s\n" %
@@ -225,7 +324,18 @@ class PackedAncestryMap:
     def __init__(self, geno_file: (str | None) = None,
                  ind_file: (str | None) = None, snp_file: (str | None) = None,
                  file_prefix: (str | None) = None, check_hash: bool = True,
-                 check_size: bool = True):
+                 check_size: bool = True) -> None:
+        """
+        Initialization method for PackedAncestryMap object.
+
+        Args:
+            geno_file (str, optional): Input .geno file, cannot be used alongside "file_prefix" parameter
+            ind_file (str, optional): Input .ind file, cannot be used alongside "file_prefix" parameter
+            snp_file (str, optional): Input .snp file, cannot be used alongside "file_prefix" parameter
+            file_prefix (str, optional): Prefix for all PackedAncestryMap files. Will read ".ind", ".snp", and ".geno" files. Cannot be used alongside "geno_file", "ind_file", or "snp_file" parameters
+            check_hash (bool): If True the hash of the object will be checked to see if it matches what hash is expected.
+            check_size (bool): If True the lengths of the ".ind" and ".snp" files will be compared with those expected by the header of the PackedAncestryMap file
+        """
         paramter_error_msg = "Inappropriate parametrization. Either only provide a 'file_prefix' parameter or provide parameters for each individual PACKEDANCESTRYMAP file component"
         # parameter handling to allow for init polymorphism
         if file_prefix is None:
@@ -270,15 +380,30 @@ class PackedAncestryMap:
         if (check_size) & (n_snp != len(self.snp_info)):
             raise Exception("Number of SNPs in .snp file (m=%i) different from what is expected by .geno file (m=%i)" % (len(self.snp_info), n_snp))
 
-    def __iter__(self):
+    def __iter__(self) -> None:
+        """
+        Basic __iter__ method. Returns self.
+
+        Returns:
+            PackedAncestryMap: returns itself
+        """
         return self
 
-    def get_SNP_Info(self):
+    def get_SNP_Info(self) -> SNP_Info:
+        """
+        Returns the SNP_Info object of the SNP whose record the PackedAncestryMap object is currently at
+
+        Returns:
+            SNP_Info: SNP_Info of length 1 indexed at the SNP which the PackedAncestryMap object is at
+        """
         if self._i_snp < 0:
             return None
         return self.snp_info[self._i_snp]
 
-    def _read_record(self):
+    def _read_record(self) -> None:
+        """
+        Reads dosages of current SNP record and saves it to the "geno" attribute
+        """
         rsb = self._recordbits
         snp_record = int.from_bytes(self._fin.read(self._recordsize))
         bit_mask = (2 ** rsb) - 1
@@ -288,7 +413,13 @@ class PackedAncestryMap:
             self.geno[i] = GENO_MAP[dos_tmp]
             rsb -= 2
 
-    def __next__(self):
+    def __next__(self) -> Self:
+        """
+        Goes to the next SNP and reads record to "geno" attribute
+
+        Returns:
+            PackedAncestryMap: PackedAncestryMap object at the next SNP
+        """
         if self._i_snp == (len(self.snp_info) - 1):
             self._fin.close()
             raise StopIteration
@@ -296,7 +427,13 @@ class PackedAncestryMap:
         self._i_snp += 1
         return self
 
-    def goto_snp(self, var_name: str):
+    def goto_snp(self, var_name: str) -> None:
+        """
+        Goes to specified SNP location and reads record to "geno" attribute
+
+        Args:
+            var_name (str): name of the variant whose record will be read
+        """
         i_var = self.snp_info.get_var_name_idx(var_name)
         self._fin.seek((1 + i_var) * self._recordsize)
         self._read_record()
