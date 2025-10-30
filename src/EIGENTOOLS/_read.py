@@ -1,10 +1,11 @@
 import copy
 import os
 from math import floor, nan
+from typing import Self
 
 
 # hashing functions
-def hash_str(s):
+def hash_str(s: str):
     hash_out = 0
     for c in s:
         hash_out *= 23
@@ -13,7 +14,7 @@ def hash_str(s):
 
 
 # get 32-bit hash from a list of strings.
-def hash_list(str_list):
+def hash_list(str_list: list[str]):
     hash_out = 0
     bit_mask = ((2 ** 32) - 1)
     for s in str_list:
@@ -25,7 +26,7 @@ def hash_list(str_list):
 
 # classes used to store the information
 class SNP_Info:
-    def __init__(self, filename):
+    def __init__(self, filename: str):
         self.var_name = []
         self.chrom = []
         self.pos = []
@@ -55,7 +56,7 @@ class SNP_Info:
             out[self.var_name[i]] = i
         return out
 
-    def __getitem__(self, index):
+    def __getitem__(self, index: int | slice):
         is_int = isinstance(index, int)
         tmp_obj = copy.copy(self)
         tmp_obj.var_name = [tmp_obj.var_name[index]] if is_int else tmp_obj.var_name[index]
@@ -73,7 +74,7 @@ class SNP_Info:
         assert len(self.var_name) == len(self.chrom) == len(self.pos) == len(self.ref) == len(self.alt) == len(self.cm)
         return len(self.var_name)
 
-    def __add__(self, obj2):
+    def __add__(self, obj2: Self):
         tmp_obj = copy.copy(self)
         tmp_obj.var_name = tmp_obj.var_name + obj2.var_name
         tmp_obj.chrom = tmp_obj.chrom + obj2.chrom
@@ -85,13 +86,13 @@ class SNP_Info:
         tmp_obj._var_name_to_index = tmp_obj._reverse_index()
         return tmp_obj
 
-    def get_var_name_idx(self, var_name):
+    def get_var_name_idx(self, var_name: str):
         try:
             return self._var_name_to_index[var_name]
         except KeyError:
             raise LookupError("Variant \"" + var_name + "\" not found")
 
-    def write(self, filename):
+    def write(self, filename: str):
         with open(filename, "w+") as f:
             for i in range(len(self)):
                 f.write("%s\t%s\t%.6f\t%i\t%s\t%s\n" %
@@ -100,7 +101,7 @@ class SNP_Info:
 
 
 class Ind_Info:
-    def __init__(self, filename):
+    def __init__(self, filename: str):
         self.ind_name = []
         self.sex = []
         self.label = []
@@ -118,7 +119,7 @@ class Ind_Info:
         self._label_to_idx = self._reverse_index()
         self._hash = hash_list(self.ind_name)
 
-    def __getitem__(self, index):
+    def __getitem__(self, index: int | slice):
         is_int = isinstance(index, int)
         tmp_obj = copy.copy(self)
         tmp_obj.ind_name = [tmp_obj.ind_name[index]] if is_int else tmp_obj.ind_name[index]
@@ -132,7 +133,7 @@ class Ind_Info:
         assert len(self.ind_name) == len(self.sex) == len(self.label)
         return len(self.ind_name)
 
-    def __add__(self, obj2):
+    def __add__(self, obj2: Self):
         tmp_obj = copy.copy(self)
         tmp_obj.ind_name = tmp_obj.ind_name + obj2.ind_name
         tmp_obj.sex = tmp_obj.sex + obj2.sex
@@ -150,13 +151,13 @@ class Ind_Info:
                 out[self.label[i]] = [i]
         return out
 
-    def get_label_indices(self, label):
+    def get_label_indices(self, label: str):
         try:
             return self._label_to_idx[label]
         except KeyError:
             raise LookupError("Label \"" + label + "\" not found.")
 
-    def write(self, filename):
+    def write(self, filename: str):
         with open(filename, "w+") as f:
             for i in range(len(self)):
                 f.write("%s\t%s\t%s\n" %
@@ -164,8 +165,10 @@ class Ind_Info:
 
 
 class PackedAncestryMap:
-    def __init__(self, geno_file=None, ind_file=None, snp_file=None,
-                 file_prefix=None, check_hash=True, check_size=True):
+    def __init__(self, geno_file: (str | None) = None,
+                 ind_file: (str | None) = None, snp_file: (str | None) = None,
+                 file_prefix: (str | None) = None, check_hash: bool = True,
+                 check_size: bool = True):
         paramter_error_msg = "Inappropriate parametrization. Either only provide a 'file_prefix' parameter or provide parameters for each individual PACKEDANCESTRYMAP file component"
         # parameter handling to allow for init polymorphism
         if file_prefix is None:

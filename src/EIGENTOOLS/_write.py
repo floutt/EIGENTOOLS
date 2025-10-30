@@ -1,13 +1,16 @@
 from math import ceil, nan
+from EIGENTOOLS._read import SNP_Info, Ind_Info
 import warnings
 
 val_map = {0: 0, 1: 1, 2: 2, nan: 3}
 
 
 class PackedAncestryMapWriter:
-    def __init__(self, snp_obj, ind_obj, geno_file=None, ind_file=None,
-                 snp_file=None, file_prefix=None, write_snp=True,
-                 write_ind=True, write_header=True):
+    def __init__(self, snp_obj: SNP_Info, ind_obj: Ind_Info,
+                 geno_file: (str | None) = None, ind_file: (str | None) = None,
+                 snp_file: (str | None) = None,
+                 file_prefix: (str | None) = None, write_snp: bool = True,
+                 write_ind: bool = True, write_header: bool = True):
         # generate useful metadata
         self._nind = len(ind_obj)
         self._nsnp = len(snp_obj)
