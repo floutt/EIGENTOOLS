@@ -22,7 +22,7 @@ class PackedAncestryMapWriter:
                  geno_file: (str | None) = None, ind_file: (str | None) = None,
                  snp_file: (str | None) = None,
                  file_prefix: (str | None) = None, write_snp: bool = True,
-                 write_ind: bool = True, write_header: bool = True):
+                 write_ind: bool = True, write_header: bool = True) -> None:
         """
         Initialization method for PackedAncestryMapWriter object.
 
@@ -75,7 +75,7 @@ class PackedAncestryMapWriter:
             self._fgeno.write(header)
             self._fgeno.write(bytes(recordsize - len(header)))
 
-    def write_record(self, dosage_list: list[Literal[0, 1, 2, nan]]):
+    def write_record(self, dosage_list: list[Literal[0, 1, 2, nan]]) -> None:
         """
         Writes SNP record to PackedAncestryMap
 
@@ -108,7 +108,7 @@ class PackedAncestryMapWriter:
         self._fgeno.write(bytes(self._trailingbytes))
         self._recordsleft -= 1
 
-    def close(self):
+    def close(self) -> None:
         """
         Closes PackedAncestryMap file object and marks object not suitable for writing
         """
