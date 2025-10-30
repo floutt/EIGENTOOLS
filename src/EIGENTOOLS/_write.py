@@ -1,6 +1,8 @@
 from math import ceil, nan
 from EIGENTOOLS._read import SNP_Info, Ind_Info
+from typing import Literal
 import warnings
+
 
 val_map = {0: 0, 1: 1, 2: 2, nan: 3}
 
@@ -49,7 +51,7 @@ class PackedAncestryMapWriter:
             self._fgeno.write(header)
             self._fgeno.write(bytes(self._recordsize - len(header)))
 
-    def write_record(self, dosage_list):
+    def write_record(self, dosage_list: list[Literal[0, 1, 2, nan]]):
         shift_by = 6
         record = 0
         # check length
