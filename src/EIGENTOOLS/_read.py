@@ -4,8 +4,20 @@ from math import floor, nan
 from typing import Self
 
 
+GENO_MAP = [0, 1, 2, nan]
+
+
 # hashing functions
-def hash_str(s: str):
+def hash_str(s: str) -> int:
+    """
+    Hash function for string, designed to be used with EIGENSTRAT individual ID
+
+    Args:
+        s: String to be hashed
+
+    Returns:
+        Integer hash for string
+    """
     hash_out = 0
     for c in s:
         hash_out *= 23
@@ -13,8 +25,16 @@ def hash_str(s: str):
     return hash_out
 
 
-# get 32-bit hash from a list of strings.
-def hash_list(str_list: list[str]):
+def hash_list(str_list: list[str]) -> int:
+    """
+    Hash function for list of strings. Designed to be used on a collection of EIGENSTRAT individual IDs
+
+    Args:
+        str_list: List of strings
+
+    Returns:
+        32-bit hash of list of strings
+    """
     hash_out = 0
     bit_mask = ((2 ** 32) - 1)
     for s in str_list:
@@ -24,15 +44,27 @@ def hash_list(str_list: list[str]):
     return hash_out
 
 
-# classes used to store the information
 class SNP_Info:
+    """
+    Class storing SNP information from EIGENSTRAT ".snp" file
+
+    Attributes:
+        var_name (list): List of variant names
+        chrom (list): List of chromosome positions
+        cm (list): List of centimorgan positions
+        pos (list): List of genomic positions
+        ref (list): List of reference alleles
+        alt (list): List of alternative alleles
+        _var_name_to_index (dict): Reverse index for var_name
+        _hash (int): Hash value for .snp file
+    """
     def __init__(self, filename: str):
         self.var_name = []
         self.chrom = []
+        self.cm = []
         self.pos = []
         self.ref = []
         self.alt = []
-        self.cm = []
         self._var_name_to_index = {}
         self._hash = 0
 
@@ -42,10 +74,10 @@ class SNP_Info:
                 elems = line.strip().split()
                 self.var_name.append(elems[0])
                 self.chrom.append(elems[1])
+                self.cm.append(float(elems[2]))
                 self.pos.append(int(elems[3]))
                 self.ref.append(elems[4])
                 self.alt.append(elems[5])
-                self.cm.append(float(elems[2]))
                 i += 1
         self._var_name_to_index = self._reverse_index()
         self._hash = hash_list(self.var_name)
@@ -101,11 +133,22 @@ class SNP_Info:
 
 
 class Ind_Info:
+    """
+    Class storing individual information from EIGENSTRAT ".ind" file
+
+    Attributes:
+        ind_name (list): List of individual IDs from file
+        sex (list): List of individuals' sex
+        label (list): List of labels for individuals. Usually a population name
+        _label_to_idx (dict): Reverse index for label.
+        _hash (int): Hash value for .ind file
+    """
+
     def __init__(self, filename: str):
         self.ind_name = []
         self.sex = []
         self.label = []
-        self._label_to_idx = {}  # indices for each population
+        self._label_to_idx = {}
         self._hash = 0
 
         with open(filename) as f:
@@ -165,6 +208,20 @@ class Ind_Info:
 
 
 class PackedAncestryMap:
+    """
+    Iterator class for PackedAncestryMap file.  Iterates through the file on a variant by variant basis.
+
+    Attributes:
+        snp_info (SNP_Info): Object storing associated SNP info for PackedAncestryMap file
+        ind_info (Ind_Info): Object storing associated individual info for PackedAncestryMap file
+        geno (list): Allelic dosages for the current SNP. Starts off as an array of zeros when at header record
+        _fin (IO[bytes]): Binary file object for PackedAncestryMap
+        _filesize (int): Size of file in bytes
+        _recordsize (int): Size of individual SNP record in bytes
+        _recordbits (int): Size of individual SNP record in bits
+        _HEADER (str): File header of PackedAncestryMap
+        _i_snp (int): Index of current SNP. Set to -1 at header record
+    """
     def __init__(self, geno_file: (str | None) = None,
                  ind_file: (str | None) = None, snp_file: (str | None) = None,
                  file_prefix: (str | None) = None, check_hash: bool = True,
@@ -183,7 +240,6 @@ class PackedAncestryMap:
                 geno_file = file_prefix + ".geno"
                 ind_file = file_prefix + ".ind"
                 snp_file = file_prefix + ".snp"
-        self._GENO_MAP = [0, 1, 2, nan]
         self.snp_info = SNP_Info(snp_file)
         self.ind_info = Ind_Info(ind_file)
         self._fin = open(geno_file, "rb")
@@ -229,7 +285,7 @@ class PackedAncestryMap:
         for i in range(len(self.ind_info)):
             dos_tmp = (snp_record << (self._recordbits - rsb)) & bit_mask
             dos_tmp = dos_tmp >> (self._recordbits - 2)
-            self.geno[i] = self._GENO_MAP[dos_tmp]
+            self.geno[i] = GENO_MAP[dos_tmp]
             rsb -= 2
 
     def __next__(self):
