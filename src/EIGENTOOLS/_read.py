@@ -240,7 +240,7 @@ class PackedAncestryMap:
         self._i_snp += 1
         return self
 
-    def goto_snp(self, var_name):
+    def goto_snp(self, var_name: str):
         i_var = self.snp_info.get_var_name_idx(var_name)
         self._fin.seek((1 + i_var) * self._recordsize)
         self._read_record()
