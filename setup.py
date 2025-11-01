@@ -8,7 +8,7 @@ long_description = (here / "README.md").read_text(encoding="utf-8")
 setup(
     name="EIGENTOOLS",
     version="0.1.0",
-    description="Python package designed for reading and writing PACKEDANCESTRY files",
+    description="Python package designed for reading and writing PACKEDANCESTRYMAP files",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/floutt/EIGENTOOLS",
