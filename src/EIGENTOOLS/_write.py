@@ -1,4 +1,4 @@
-from math import ceil, nan
+from math import ceil, nan, isnan
 from EIGENTOOLS._read import SNP_Info, Ind_Info
 from typing import Literal
 import warnings
@@ -90,6 +90,7 @@ class PackedAncestryMapWriter:
         elif self._isclosed:
             raise ValueError("PackedAncestryMapWriter object is closed.")
         for v in dosage_list:
+            v = nan if isnan(v) else v  # use proper nan instance
             try:
                 val_map[v]
             except KeyError:
