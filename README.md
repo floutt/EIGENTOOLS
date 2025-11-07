@@ -4,6 +4,12 @@
 ## Dependencies
 This package requires Python 3.11+. There are no external dependencies.
 
+## Installation
+This package can be installed with pip as follows:
+```
+pip install git+https://github.com/floutt/EIGENTOOLS.git
+```
+
 ## Use Cases
 The simplicity of the `EIGENTOOLS` package lends itself to a wide variety of use cases. For instance, this package has been used for the following purposes:
 - [Showing differences in Duffy-null allele frequency between different population groups](https://gist.github.com/floutt/2ac10f98fc0e2a6cdbf8273e3415dca2)
