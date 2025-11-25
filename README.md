@@ -17,4 +17,4 @@ The simplicity of the `EIGENTOOLS` package lends itself to a wide variety of use
 - [Appending PACKEDANCESTRYMAP files to a master file](https://github.com/floutt/append_eigenstrat)
 
 ## Tutorial
-A basic tutorial on the package can be found [here](#)
+A basic tutorial on the package can be found [here](https://gist.github.com/floutt/37dbf26dfe5684abc762b1997017ca84)
